@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battleship.iml" filepath="$PROJECT_DIR$/.idea/modules/Battleship.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Problems/Binary search/Battleship.Problems-Binary_search.iml" filepath="$PROJECT_DIR$/.idea/modules/Problems/Binary search/Battleship.Problems-Binary_search.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Problems/Binary search/Battleship.Problems-Binary_search.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Problems/Binary search/Battleship.Problems-Binary_search.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Problems/Binary search/Battleship.Problems-Binary_search.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Problems/Binary search/Battleship.Problems-Binary_search.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Battleship.util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Battleship.util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Battleship.util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Battleship.util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Battleship.util.test.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Battleship.util.test.iml" />
+    </modules>
+  </component>
+</project>
