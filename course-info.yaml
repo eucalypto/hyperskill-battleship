@@ -7,5 +7,6 @@ summary: Writing games is probably one of the most exciting tasks in programming
 programming_language: Java
 programming_language_version: 11
 content:
+- Battleship
 - Problems
 mode: Study
