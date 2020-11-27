@@ -17,6 +17,7 @@ subprojects {
 
     dependencies {
         testImplementation 'com.github.hyperskill:hs-test:release-SNAPSHOT'
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.4.2'
     }
 
     configurations.all {
