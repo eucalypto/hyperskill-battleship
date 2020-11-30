@@ -33,6 +33,11 @@ class BattleFieldTest {
         assertEquals(emptyFieldRepresentation, fieldRepresentation);
     }
 
+    @Test
+    void setAircraftCarrier() {
+        battleField.setAircraftCarrier();
+    }
+
 
 
 
