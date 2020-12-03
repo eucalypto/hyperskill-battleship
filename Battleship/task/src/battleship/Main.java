@@ -7,6 +7,10 @@ public class Main {
     public static void main(String[] args) {
         var battleFiled = new BattleField();
 
+        System.out.println(battleFiled.getRepresentationString() + "\n");
+
+        battleFiled.setAircraftCarrier();
+
         System.out.println(battleFiled.getRepresentationString());
     }
 }
@@ -17,17 +21,22 @@ class BattleField {
     BattleFieldModel battleFieldModel = new BattleFieldModel();
 
     public String getRepresentationString() {
-        return "  1 2 3 4 5 6 7 8 9 10\n" +
-                "A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "B ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+        var bamboozle = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
+
+        var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10\n");
+
+
+        return bamboozle;
     }
 
     public void setAircraftCarrier() {
@@ -51,24 +60,43 @@ class BattleFieldModel {
     Field[][] fields = new Field[FIELD_SIZE][FIELD_SIZE];
 
     public BattleFieldModel() {
-        for (int xPos = 0; xPos < FIELD_SIZE; xPos++) {
-            for (int yPos = 0; yPos < FIELD_SIZE; yPos++) {
-                fields[xPos][yPos] = new Field(new Coordinates(xPos, yPos));
+
+        for (int yPos = 0; yPos < FIELD_SIZE; yPos++) {
+            for (int xPos = 0; xPos < FIELD_SIZE; xPos++) {
+                fields[yPos][xPos] = new Field(new Coordinates(xPos, yPos));
             }
         }
     }
 
     public void setAircraftCarrier(Coordinates startCoordinates, Coordinates endCoordinates) {
-        if (Math.abs(startCoordinates.getyPos() - endCoordinates.getyPos()) != 4)
-            throw new WrongInput();
 
-        if (startCoordinates.getxPos() != endCoordinates.getxPos()
-                && startCoordinates.getyPos() != endCoordinates.getyPos())
-            throw new WrongInput();
+        if (startCoordinates.getxPos() == endCoordinates.getxPos()) {
+            var shipLength = Math.abs(startCoordinates.getyPos() - endCoordinates.getyPos());
+            checkAircraftCarrierLength(shipLength);
+
+            var xPos = startCoordinates.getxPos();
+            for (int yPos = 0; yPos < 5; yPos++) {
+                fields[yPos][xPos].status = Field.Status.SHIP;
+            }
+        } else if (startCoordinates.getyPos() == endCoordinates.getyPos()) {
+            var shipLength = Math.abs(startCoordinates.getxPos() - endCoordinates.getxPos());
+            checkAircraftCarrierLength(shipLength);
+
+            var yPos = startCoordinates.getyPos();
+            for (int xPos = 0; xPos < 5; xPos++) {
+                fields[yPos][xPos].status = Field.Status.SHIP;
+            }
+        } else {
+            throw new WrongInput("Aircraft Carrier must be either horizontal or vertical!");
+        }
 
 
-        for (int yPos = 0; yPos < 5; yPos++) {
-            fields[0][yPos].status = Field.Status.SHIP;
+    }
+
+    private void checkAircraftCarrierLength(int shipLength) {
+        if (shipLength != 4) {
+            throw new WrongInput("Aircraft carrier wrong length. Should be 4, but is "
+                    + shipLength);
         }
     }
 
@@ -77,7 +105,7 @@ class BattleFieldModel {
     }
 
     public Field getField(Coordinates coordinates) {
-        return fields[coordinates.getxPos()][coordinates.getyPos()];
+        return fields[coordinates.getyPos()][coordinates.getxPos()];
     }
 }
 
@@ -166,4 +194,11 @@ class Coordinates {
 
 class WrongInput extends IllegalArgumentException {
 
+    public WrongInput() {
+
+    }
+
+    public WrongInput(String s) {
+        super(s);
+    }
 }

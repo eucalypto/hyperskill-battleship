@@ -19,34 +19,65 @@ class BattleFieldModelTest {
 
     @Test
     void airCraftCarrierNotHorizontalOrVertical_throwsWrongInput() {
-        assertThrows(WrongInput.class, () -> {
+        var thrown = assertThrows(WrongInput.class, () -> {
             battleFieldModel.setAircraftCarrier(
                     new Coordinates(0, 0),
                     new Coordinates(4, 4));
         });
+
+        assertTrue(thrown.getMessage().contains("either horizontal or vertical"));
     }
 
 
     @Test
-    void setAircraftCarrierTooLong_throwsException() {
-        assertThrows(WrongInput.class, () -> {
+    void setAircraftCarrierVerticalTooLong_throwsWrongInput() {
+        var thrown = assertThrows(WrongInput.class, () -> {
             battleFieldModel.setAircraftCarrier(
                     new Coordinates(0, 0),
                     new Coordinates(0, 5));
         });
+
+        assertTrue(thrown.getMessage().contains("wrong length"));
     }
 
     @Test
-    void setAircraftCarrierTooShort_throwsWrongInput() {
-        assertThrows(WrongInput.class, () -> {
+    void setAircraftCarrierVerticalTooShort_throwsWrongInput() {
+        var thrown = assertThrows(WrongInput.class, () -> {
+            battleFieldModel.setAircraftCarrier(
+                    new Coordinates(0, 0),
+                    new Coordinates(0, 3));
+        });
+
+        assertTrue(thrown.getMessage().contains("wrong length"));
+
+    }
+
+    @Test
+    void setAircraftCarrierHorizontalTooLong_throwsWrongInput() {
+        var thrown = assertThrows(WrongInput.class, () -> {
+            battleFieldModel.setAircraftCarrier(
+                    new Coordinates(0, 0),
+                    new Coordinates(5, 0));
+        });
+
+        assertTrue(thrown.getMessage().contains("wrong length"));
+
+    }
+
+    @Test
+    void set_aircraft_carrier_horizontal_too_short_throws_WrongInput() {
+        var thrown = assertThrows(WrongInput.class, () -> {
             battleFieldModel.setAircraftCarrier(
                     new Coordinates(0, 0),
                     new Coordinates(3, 0));
         });
+
+        assertTrue(thrown.getMessage().contains("wrong length"));
+
     }
 
     @Test
-    void setAircraftCarrier() {
+    void set_aircraft_carrier_vertical_starting_at_00() {
         var start = new Coordinates(0, 0);
         var end = new Coordinates(0, 4);
 
@@ -55,6 +86,40 @@ class BattleFieldModelTest {
         assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
         assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
     }
+
+    @Test
+    void set_aircraft_carrier_vertical_starting_at_90() {
+        var start = new Coordinates(9, 0);
+        var end = new Coordinates(9, 4);
+
+        battleFieldModel.setAircraftCarrier(start, end);
+
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+    }
+
+    @Test
+    void set_aircraft_carrier_horizontal_starting_at_00() {
+        var start = new Coordinates(0, 0);
+        var end = new Coordinates(4, 0);
+
+        battleFieldModel.setAircraftCarrier(start, end);
+
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+    }
+
+    @Test
+    void set_aircraft_carrier_horizontal_starting_at_09() {
+        var start = new Coordinates(0, 9);
+        var end = new Coordinates(4, 9);
+
+        battleFieldModel.setAircraftCarrier(start, end);
+
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+    }
+
 
     @Test
     void getField_00() {

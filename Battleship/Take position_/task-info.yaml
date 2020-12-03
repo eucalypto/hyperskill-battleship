@@ -283,9 +283,6 @@ files:
         }
     }
   learner_created: false
-- name: src/battleship/BattleField.java
-  visible: true
-  learner_created: true
 - name: test/battleship/BattleFieldTest.java
   visible: true
   learner_created: true
