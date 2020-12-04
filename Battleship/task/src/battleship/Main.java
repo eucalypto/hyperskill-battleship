@@ -21,27 +21,33 @@ class BattleField {
     BattleFieldModel battleFieldModel = new BattleFieldModel();
 
     public String getRepresentationString() {
-        var bamboozle = "  1 2 3 4 5 6 7 8 9 10\n" +
-                "A O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "B O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "C O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "D O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "E O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
 
         var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10\n");
+        var rowLetter = 'A';
+        for (var row : battleFieldModel.fields) {
+            ret.append(rowLetter);
+            rowLetter++;
+            for (var field : row) {
+                ret.append(" ");
+                switch (field.status) {
+                    case EMPTY:
+                        ret.append("~");
+                        break;
+                    case SHIP:
+                        ret.append("O");
+                        break;
+                }
+            }
+            ret.append("\n");
+        }
 
 
-        return bamboozle;
+        return ret.toString();
     }
 
     public void setAircraftCarrier() {
         System.out.println("Enter the coordinates of the Aircraft Carrier (5 cells):");
-        var rawInput = scanner.next();
+        var rawInput = scanner.nextLine();
         CoordinatesPair coordinatesPair = getPositionPairFromRawInput(rawInput);
         battleFieldModel.setAircraftCarrier(coordinatesPair);
     }
@@ -70,21 +76,27 @@ class BattleFieldModel {
 
     public void setAircraftCarrier(Coordinates startCoordinates, Coordinates endCoordinates) {
 
-        if (startCoordinates.getxPos() == endCoordinates.getxPos()) {
-            var shipLength = Math.abs(startCoordinates.getyPos() - endCoordinates.getyPos());
+        var isVertical = startCoordinates.getxPos() == endCoordinates.getxPos();
+        var isHorizontal = startCoordinates.getyPos() == endCoordinates.getyPos();
+        if (isVertical) {
+            var start = startCoordinates.getyPos();
+            var end = endCoordinates.getyPos();
+            var shipLength = Math.abs(start - end);
             checkAircraftCarrierLength(shipLength);
 
             var xPos = startCoordinates.getxPos();
-            for (int yPos = 0; yPos < 5; yPos++) {
+            for (int yPos = start; yPos <= end; yPos++) {
                 fields[yPos][xPos].status = Field.Status.SHIP;
             }
-        } else if (startCoordinates.getyPos() == endCoordinates.getyPos()) {
-            var shipLength = Math.abs(startCoordinates.getxPos() - endCoordinates.getxPos());
+        } else if (isHorizontal) {
+            var start = startCoordinates.getxPos();
+            var end = endCoordinates.getxPos();
+            var shipLength = Math.abs(start - end);
             checkAircraftCarrierLength(shipLength);
 
-            var yPos = startCoordinates.getyPos();
-            for (int xPos = 0; xPos < 5; xPos++) {
-                fields[yPos][xPos].status = Field.Status.SHIP;
+            var row = startCoordinates.getyPos();
+            for (int x = start; x <= end; x++) {
+                fields[row][x].status = Field.Status.SHIP;
             }
         } else {
             throw new WrongInput("Aircraft Carrier must be either horizontal or vertical!");

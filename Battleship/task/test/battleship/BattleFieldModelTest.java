@@ -99,6 +99,17 @@ class BattleFieldModelTest {
     }
 
     @Test
+    void set_aircraft_carrier_vertical_ending_at_99() {
+        var start = new Coordinates(9, 5);
+        var end = new Coordinates(9, 9);
+
+        battleFieldModel.setAircraftCarrier(start, end);
+
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+    }
+
+    @Test
     void set_aircraft_carrier_horizontal_starting_at_00() {
         var start = new Coordinates(0, 0);
         var end = new Coordinates(4, 0);
@@ -113,6 +124,17 @@ class BattleFieldModelTest {
     void set_aircraft_carrier_horizontal_starting_at_09() {
         var start = new Coordinates(0, 9);
         var end = new Coordinates(4, 9);
+
+        battleFieldModel.setAircraftCarrier(start, end);
+
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+        assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+    }
+
+    @Test
+    void set_aircraft_carrier_horizontal_ending_at_99() {
+        var start = new Coordinates(5, 9);
+        var end = new Coordinates(9, 9);
 
         battleFieldModel.setAircraftCarrier(start, end);
 
