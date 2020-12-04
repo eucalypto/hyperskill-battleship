@@ -75,5 +75,52 @@ class BattleFieldTest {
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
+    @Test
+    void print_field_with_horizontal_battleship_ending_at_99() {
+        battleField.battleFieldModel.setBattleship(
+                new Coordinates(6, 9),
+                new Coordinates(9, 9));
+        var fieldRepresentation = battleField.getRepresentationString();
+
+        var expectedFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "J ~ ~ ~ ~ ~ ~ O O O O\n";
+        assertEquals(expectedFieldRepresentation, fieldRepresentation);
+    }
+
+    @Test
+    void print_field_with_two_vessels() {
+        battleField.battleFieldModel.setBattleship(
+                new Coordinates(6, 9),
+                new Coordinates(9, 9));
+
+        battleField.battleFieldModel.setAircraftCarrier(
+                new Coordinates(0, 0),
+                new Coordinates(0, 4));
+
+        var fieldRepresentation = battleField.getRepresentationString();
+
+        var expectedFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "J ~ ~ ~ ~ ~ ~ O O O O\n";
+        assertEquals(expectedFieldRepresentation, fieldRepresentation);
+    }
+
 
 }

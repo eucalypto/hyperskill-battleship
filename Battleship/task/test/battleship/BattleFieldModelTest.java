@@ -1,11 +1,8 @@
 package battleship;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import javax.swing.text.Position;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -151,13 +148,41 @@ class BattleFieldModelTest {
     }
 
     @Nested
+    class BattleShip {
+        @Test
+        void vertical_battleship_too_short() {
+            var start = new Coordinates(0, 0);
+            var end = new Coordinates(0, 2);
+            var thrown = assertThrows(WrongInput.class,
+                    () -> battleFieldModel.setBattleship(start, end));
+
+            assertTrue(thrown.getMessage().contains("wrong length"));
+        }
+
+        @Test
+        void horizontal_battleship_too_long() {
+            var start = new Coordinates(0, 0);
+            var end = new Coordinates(4, 0);
+            var thrown = assertThrows(WrongInput.class,
+                    () -> battleFieldModel.setBattleship(start, end));
+
+            assertTrue(thrown.getMessage().contains("wrong length"));
+        }
+
+
+    }
+
+
+    @Nested
     class VerticalBattleship {
         @Test
         void battleship() {
-            battleFieldModel.setBattleship(
-                    new Coordinates(0, 0),
-                    new Coordinates(4, 0));
+            var start = new Coordinates(9, 6);
+            var end = new Coordinates(9, 9);
+            battleFieldModel.setBattleship(start, end);
 
+            assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+            assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
         }
     }
 
