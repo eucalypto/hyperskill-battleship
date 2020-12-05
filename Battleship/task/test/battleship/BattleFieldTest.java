@@ -97,6 +97,27 @@ class BattleFieldTest {
     }
 
     @Test
+    void print_field_with_vertical_submarine_ending_at_99() {
+        battleField.battleFieldModel.setSubmarine(
+                new Coordinates(9, 7),
+                new Coordinates(9, 9));
+        var fieldRepresentation = battleField.getRepresentationString();
+
+        var expectedFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ O\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ O\n" +
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ O\n";
+        assertEquals(expectedFieldRepresentation, fieldRepresentation);
+    }
+
+    @Test
     void print_field_with_two_vessels() {
         battleField.battleFieldModel.setBattleship(
                 new Coordinates(6, 9),
