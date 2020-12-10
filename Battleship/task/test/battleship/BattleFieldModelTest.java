@@ -18,12 +18,29 @@ class BattleFieldModelTest {
 
     @Test
     void airCraftCarrierNotHorizontalOrVertical_throwsWrongInput() {
-        var thrown = assertThrows(WrongInput.class,
-                () -> battleFieldModel.setAircraftCarrier(
-                        new Coordinates(0, 0),
-                        new Coordinates(4, 4)));
+        var thrown = assertThrows(WrongLocation.class,
+                () -> battleFieldModel.setVessel(
+                        new CoordinatesPair(
+                                new Coordinates(0, 0),
+                                new Coordinates(4, 4)),
+                        BattleFieldModel.VesselType.AIRCRAFT_CARRIER));
+
 
         assertTrue(thrown.getMessage().contains("either horizontal or vertical"));
+    }
+
+    @Test
+    void ships_right_next_to_each_other_throws_TooClose() {
+        battleFieldModel.setVessel(new CoordinatesPair(
+                        new Coordinates(1, 1),
+                        new Coordinates(1, 2)),
+                BattleFieldModel.VesselType.DESTROYER);
+
+        assertThrows(TooClose.class,
+                () -> battleFieldModel.setVessel(new CoordinatesPair(
+                                new Coordinates(2, 1),
+                                new Coordinates(2, 2)),
+                        BattleFieldModel.VesselType.DESTROYER));
     }
 
 
@@ -32,7 +49,7 @@ class BattleFieldModelTest {
 
         @Test
         void setAircraftCarrierVerticalTooLong_throwsWrongInput() {
-            var thrown = assertThrows(WrongInput.class,
+            var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
                             new Coordinates(0, 5)));
@@ -42,7 +59,7 @@ class BattleFieldModelTest {
 
         @Test
         void setAircraftCarrierVerticalTooShort_throwsWrongInput() {
-            var thrown = assertThrows(WrongInput.class,
+            var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
                             new Coordinates(0, 3)));
@@ -92,7 +109,7 @@ class BattleFieldModelTest {
 
         @Test
         void setAircraftCarrierHorizontalTooLong_throwsWrongInput() {
-            var thrown = assertThrows(WrongInput.class,
+            var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
                             new Coordinates(5, 0)));
@@ -103,7 +120,7 @@ class BattleFieldModelTest {
 
         @Test
         void set_aircraft_carrier_horizontal_too_short_throws_WrongInput() {
-            var thrown = assertThrows(WrongInput.class,
+            var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
                             new Coordinates(3, 0)));
@@ -153,7 +170,7 @@ class BattleFieldModelTest {
         void vertical_battleship_too_short() {
             var start = new Coordinates(0, 0);
             var end = new Coordinates(0, 2);
-            var thrown = assertThrows(WrongInput.class,
+            var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setBattleship(start, end));
 
             assertTrue(thrown.getMessage().contains("wrong length"));
@@ -163,10 +180,21 @@ class BattleFieldModelTest {
         void horizontal_battleship_too_long() {
             var start = new Coordinates(0, 0);
             var end = new Coordinates(4, 0);
-            var thrown = assertThrows(WrongInput.class,
+            var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setBattleship(start, end));
 
             assertTrue(thrown.getMessage().contains("wrong length"));
+        }
+
+        @Test
+        void battleship_switched_start_end_positions_still_ok() {
+            var end = new Coordinates(0, 0);
+            var start = new Coordinates(3, 0);
+
+            battleFieldModel.setBattleship(start, end);
+
+            assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+            assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
         }
 
 

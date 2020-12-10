@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/397107/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: Sat, 05 Dec 2020 09:24:41 UTC
+update_date: Thu, 10 Dec 2020 20:32:42 UTC
 stages:
 - id: 663
   step: 10594
@@ -148,10 +148,6 @@ topics:
   4:
   - title: Overloading
     theory_id: 3525
-  - title: Final variables
-    theory_id: 7427
-  - title: Static members
-    theory_id: 3534
   - title: Multiple constructors
     theory_id: 3538
   - title: The keyword super
@@ -166,3 +162,12 @@ topics:
     theory_id: 3587
   - title: Abstract class
     theory_id: 3597
+  2:
+  - title: Final variables
+    theory_id: 7427
+  - title: Static members
+    theory_id: 3534
+  - title: Enums in Java
+    theory_id: 11514
+  - title: Fields and methods in enum
+    theory_id: 11523

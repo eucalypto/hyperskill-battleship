@@ -1,6 +1,8 @@
 package battleship;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Main {
 
@@ -16,6 +18,12 @@ public class Main {
         System.out.println(battleFiled.getRepresentationString() + "\n");
 
         battleFiled.setSubmarine();
+        System.out.println(battleFiled.getRepresentationString() + "\n");
+
+        battleFiled.setCruiser();
+        System.out.println(battleFiled.getRepresentationString() + "\n");
+
+        battleFiled.setDestroyer();
         System.out.println(battleFiled.getRepresentationString() + "\n");
     }
 }
@@ -45,46 +53,44 @@ class BattleField {
             }
             ret.append("\n");
         }
-
-
         return ret.toString();
     }
 
     public void setAircraftCarrier() {
-        var notSet = true;
-
-        while (notSet) {
-            System.out.println("Enter the coordinates of the Aircraft Carrier (5 cells):");
-            var rawInput = scanner.nextLine();
-            CoordinatesPair coordinatesPair = getPositionPairFromRawInput(rawInput);
-            try {
-                battleFieldModel.setAircraftCarrier(coordinatesPair);
-                notSet = false;
-            } catch (WrongInput wrongInput) {
-                System.out.println("Error! Wrong length of the Aircraft Carrier! Try again:");
-            }
-        }
+        setVessel(BattleFieldModel.VesselType.AIRCRAFT_CARRIER);
     }
 
     public void setBattleship() {
-        System.out.println("Enter the coordinates of the Battleship (4 cells):");
-        var rawInput = scanner.nextLine();
-        CoordinatesPair coordinatesPair = getPositionPairFromRawInput(rawInput);
-        battleFieldModel.setBattleship(coordinatesPair);
+        setVessel(BattleFieldModel.VesselType.BATTLESHIP);
     }
 
     public void setSubmarine() {
-        var successful = false;
+        setVessel(BattleFieldModel.VesselType.SUBMARINE);
+    }
 
-        while (!successful) {
-            System.out.println("Enter the coordinates of the Submarine (3 cells):");
+    public void setCruiser() {
+        setVessel(BattleFieldModel.VesselType.CRUISER);
+    }
+
+    public void setDestroyer() {
+        setVessel(BattleFieldModel.VesselType.DESTROYER);
+    }
+
+    void setVessel(BattleFieldModel.VesselType vesselType) {
+        var notSet = true;
+
+        while (notSet) {
+            System.out.printf("Enter the coordinates of the %s (%d cells):\n",
+                    vesselType.getName(), vesselType.getLength());
             var rawInput = scanner.nextLine();
             CoordinatesPair coordinatesPair = getPositionPairFromRawInput(rawInput);
             try {
-                battleFieldModel.setSubmarine(coordinatesPair);
-                successful = true;
-            } catch (WrongInput wrongInput) {
-                System.out.println("Error! Wrong length of the Submarine! Try again:");
+                battleFieldModel.setVessel(coordinatesPair, vesselType);
+                notSet = false;
+            } catch (WrongLength wrongLength) {
+                System.out.printf("Error! Wrong length of the %s! Try again:\n", vesselType.getName());
+            } catch (WrongLocation wrongLocation) {
+                System.out.println("Error! Wrong ship location! Try again:");
             }
         }
     }
@@ -115,23 +121,25 @@ class BattleFieldModel {
         return fields[coordinates.getyPos()][coordinates.getxPos()];
     }
 
-    void setAircraftCarrier(CoordinatesPair coordinatesPair) {
-        setVessel(coordinatesPair, VesselType.AIRCRAFT_CARRIER);
-    }
-
+    /**
+     * @deprecated use {@link BattleFieldModel#setVessel(CoordinatesPair, VesselType)} instead.
+     */
+    @Deprecated
     void setAircraftCarrier(Coordinates startCoordinates, Coordinates endCoordinates) {
-        setAircraftCarrier(new CoordinatesPair(startCoordinates, endCoordinates));
+        setVessel(new CoordinatesPair(startCoordinates, endCoordinates), VesselType.AIRCRAFT_CARRIER);
     }
 
+    @Deprecated
     void setBattleship(Coordinates startCoordinates, Coordinates endCoordinates) {
-        setBattleship(new CoordinatesPair(startCoordinates, endCoordinates));
+        setVessel(new CoordinatesPair(startCoordinates, endCoordinates), VesselType.BATTLESHIP);
     }
 
-    void setBattleship(CoordinatesPair coordinatesPair) {
-        setVessel(coordinatesPair, VesselType.BATTLESHIP);
+    @Deprecated
+    void setSubmarine(Coordinates startCoordinates, Coordinates endCoordinates) {
+        setVessel(new CoordinatesPair(startCoordinates, endCoordinates), VesselType.SUBMARINE);
     }
 
-    private void setVessel(CoordinatesPair startAndEnd, VesselType vesselType) {
+    public void setVessel(CoordinatesPair startAndEnd, VesselType vesselType) {
 
         var startCoordinates = startAndEnd.getStart();
         var endCoordinates = startAndEnd.getEnd();
@@ -139,54 +147,86 @@ class BattleFieldModel {
         var isVertical = startCoordinates.getxPos() == endCoordinates.getxPos();
         var isHorizontal = startCoordinates.getyPos() == endCoordinates.getyPos();
         if (isVertical) {
-            var start = startCoordinates.getyPos();
-            var end = endCoordinates.getyPos();
-            var shipLength = Math.abs(start - end) + 1;
+            var start = Math.min(startCoordinates.getyPos(), endCoordinates.getyPos());
+            var end = Math.max(startCoordinates.getyPos(), endCoordinates.getyPos());
+            var shipLength = end - start + 1;
+
             checkVesselLength(shipLength, vesselType);
+            checkVesselVicinityVertical(startAndEnd);
 
             var xPos = startCoordinates.getxPos();
             for (int yPos = start; yPos <= end; yPos++) {
                 fields[yPos][xPos].status = Field.Status.SHIP;
             }
         } else if (isHorizontal) {
-            var start = startCoordinates.getxPos();
-            var end = endCoordinates.getxPos();
-            var shipLength = Math.abs(start - end) + 1;
+            var start = Math.min(startCoordinates.getxPos(), endCoordinates.getxPos());
+            var end = Math.max(startCoordinates.getxPos(), endCoordinates.getxPos());
+            var shipLength = end - start + 1;
+
             checkVesselLength(shipLength, vesselType);
+            checkVesselVicinityHorizontal(startAndEnd);
 
             var row = startCoordinates.getyPos();
             for (int x = start; x <= end; x++) {
                 fields[row][x].status = Field.Status.SHIP;
             }
         } else {
-            throw new WrongInput("Vessel must be either horizontal or vertical!");
+            throw new WrongLocation("Vessel must be either horizontal or vertical!");
         }
 
+    }
 
+    private void checkVesselVicinityHorizontal(CoordinatesPair startAndEnd) {
+        List<Field> vicinity = getNeighboringFieldsHorizontal(startAndEnd);
+    }
+
+    private List<Field> getNeighboringFieldsHorizontal(CoordinatesPair startAndEnd) {
+
+        return null;
+    }
+
+    private void checkVesselVicinityVertical(CoordinatesPair startAndEnd) {
+        Set<Field> vicinity = getNeighboringFieldsVertical(startAndEnd);
+    }
+
+    private Set<Field> getNeighboringFieldsVertical(CoordinatesPair startAndEnd) {
+        Coordinates start;
+        if (startAndEnd.getStart().getyPos() < startAndEnd.getEnd().getyPos())
+            start = startAndEnd.getStart();
+
+
+        return null;
     }
 
     private void checkVesselLength(int shipLength, VesselType vesselType) {
         if (shipLength != vesselType.length) {
-            throw new WrongInput("Ship has wrong length. Should be " + vesselType.length + " , but is " + shipLength);
+            throw new WrongLength("Ship has wrong length. Should be " + vesselType.length + " , but is " + shipLength);
         }
-    }
-
-    void setSubmarine(Coordinates startCoordinates, Coordinates endCoordinates) {
-        setSubmarine(new CoordinatesPair(startCoordinates, endCoordinates));
-    }
-
-    void setSubmarine(CoordinatesPair coordinatesPair) {
-        setVessel(coordinatesPair, VesselType.SUBMARINE);
     }
 
 
     enum VesselType {
-        AIRCRAFT_CARRIER(5), BATTLESHIP(4), SUBMARINE(3);
+        AIRCRAFT_CARRIER(5, "Aircraft Carrier"),
+        BATTLESHIP(4, "Battleship"),
+        SUBMARINE(3, "Submarine"),
+        CRUISER(3, "Cruiser"),
+        DESTROYER(2, "Destroyer");
+
 
         private final int length;
+        private final String name;
 
-        VesselType(int shipLength) {
+        VesselType(int shipLength, String name) {
             this.length = shipLength;
+            this.name = name;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }
@@ -274,13 +314,31 @@ class Coordinates {
     }
 }
 
-class WrongInput extends IllegalArgumentException {
+class WrongLength extends IllegalArgumentException {
 
-    public WrongInput() {
+    public WrongLength() {
 
     }
 
-    public WrongInput(String s) {
+    public WrongLength(String s) {
+        super(s);
+    }
+}
+
+class WrongLocation extends IllegalArgumentException {
+    public WrongLocation() {
+    }
+
+    public WrongLocation(String s) {
+        super(s);
+    }
+}
+
+class TooClose extends IllegalArgumentException {
+    public TooClose() {
+    }
+
+    public TooClose(String s) {
         super(s);
     }
 }
