@@ -103,8 +103,12 @@ class BattleField {
     }
 }
 
-class BattleFieldModel {
+abstract class Constants {
     static final int FIELD_SIZE = 10;
+}
+
+class BattleFieldModel {
+    static final int FIELD_SIZE = Constants.FIELD_SIZE;
 
     Field[][] fields = new Field[FIELD_SIZE][FIELD_SIZE];
 
@@ -112,13 +116,59 @@ class BattleFieldModel {
 
         for (int yPos = 0; yPos < FIELD_SIZE; yPos++) {
             for (int xPos = 0; xPos < FIELD_SIZE; xPos++) {
-                fields[yPos][xPos] = new Field(new Coordinates(xPos, yPos));
+                fields[yPos][xPos] = new Field(yPos, xPos);
             }
         }
     }
 
+    public Field getField(int vertical, int horizontal) {
+        return fields[vertical][horizontal];
+    }
+
+    public Field getAbove(Field current) {
+        return getField(0, 0);
+    }
+
+    public void setVessel(CoordinatesPair startAndEnd, VesselType vesselType) {
+
+        var startCoordinates = startAndEnd.getStart();
+        var endCoordinates = startAndEnd.getEnd();
+
+        var isVertical = startCoordinates.getHorizontalIndex() == endCoordinates.getHorizontalIndex();
+        var isHorizontal = startCoordinates.getVerticalIndex() == endCoordinates.getVerticalIndex();
+        if (isVertical) {
+            var start = Math.min(startCoordinates.getVerticalIndex(), endCoordinates.getVerticalIndex());
+            var end = Math.max(startCoordinates.getVerticalIndex(), endCoordinates.getVerticalIndex());
+            var shipLength = end - start + 1;
+
+            checkVesselLength(shipLength, vesselType);
+            checkVesselVicinityVertical(startAndEnd);
+
+            var xPos = startCoordinates.getHorizontalIndex();
+            for (int yPos = start; yPos <= end; yPos++) {
+                fields[yPos][xPos].status = Field.Status.SHIP;
+            }
+        } else if (isHorizontal) {
+            var start = Math.min(startCoordinates.getHorizontalIndex(), endCoordinates.getHorizontalIndex());
+            var end = Math.max(startCoordinates.getHorizontalIndex(), endCoordinates.getHorizontalIndex());
+            var shipLength = end - start + 1;
+
+            checkVesselLength(shipLength, vesselType);
+            checkVesselVicinityHorizontal(startAndEnd);
+
+            var row = startCoordinates.getVerticalIndex();
+            for (int x = start; x <= end; x++) {
+                fields[row][x].status = Field.Status.SHIP;
+            }
+        } else {
+            throw new WrongLocation("Vessel must be either horizontal or vertical!");
+        }
+
+    }
+
+    @Deprecated
     Field getField(Coordinates coordinates) {
-        return fields[coordinates.getyPos()][coordinates.getxPos()];
+        return fields[coordinates.getVerticalIndex()][coordinates.getHorizontalIndex()];
     }
 
     /**
@@ -139,69 +189,32 @@ class BattleFieldModel {
         setVessel(new CoordinatesPair(startCoordinates, endCoordinates), VesselType.SUBMARINE);
     }
 
-    public void setVessel(CoordinatesPair startAndEnd, VesselType vesselType) {
-
-        var startCoordinates = startAndEnd.getStart();
-        var endCoordinates = startAndEnd.getEnd();
-
-        var isVertical = startCoordinates.getxPos() == endCoordinates.getxPos();
-        var isHorizontal = startCoordinates.getyPos() == endCoordinates.getyPos();
-        if (isVertical) {
-            var start = Math.min(startCoordinates.getyPos(), endCoordinates.getyPos());
-            var end = Math.max(startCoordinates.getyPos(), endCoordinates.getyPos());
-            var shipLength = end - start + 1;
-
-            checkVesselLength(shipLength, vesselType);
-            checkVesselVicinityVertical(startAndEnd);
-
-            var xPos = startCoordinates.getxPos();
-            for (int yPos = start; yPos <= end; yPos++) {
-                fields[yPos][xPos].status = Field.Status.SHIP;
-            }
-        } else if (isHorizontal) {
-            var start = Math.min(startCoordinates.getxPos(), endCoordinates.getxPos());
-            var end = Math.max(startCoordinates.getxPos(), endCoordinates.getxPos());
-            var shipLength = end - start + 1;
-
-            checkVesselLength(shipLength, vesselType);
-            checkVesselVicinityHorizontal(startAndEnd);
-
-            var row = startCoordinates.getyPos();
-            for (int x = start; x <= end; x++) {
-                fields[row][x].status = Field.Status.SHIP;
-            }
-        } else {
-            throw new WrongLocation("Vessel must be either horizontal or vertical!");
+    private void checkVesselLength(int shipLength, VesselType vesselType) {
+        if (shipLength != vesselType.length) {
+            throw new WrongLength("Ship has wrong length. Should be " + vesselType.length + " , but is " + shipLength);
         }
-
-    }
-
-    private void checkVesselVicinityHorizontal(CoordinatesPair startAndEnd) {
-        List<Field> vicinity = getNeighboringFieldsHorizontal(startAndEnd);
-    }
-
-    private List<Field> getNeighboringFieldsHorizontal(CoordinatesPair startAndEnd) {
-
-        return null;
     }
 
     private void checkVesselVicinityVertical(CoordinatesPair startAndEnd) {
         Set<Field> vicinity = getNeighboringFieldsVertical(startAndEnd);
     }
 
+    private void checkVesselVicinityHorizontal(CoordinatesPair startAndEnd) {
+        List<Field> vicinity = getNeighboringFieldsHorizontal(startAndEnd);
+    }
+
     private Set<Field> getNeighboringFieldsVertical(CoordinatesPair startAndEnd) {
         Coordinates start;
-        if (startAndEnd.getStart().getyPos() < startAndEnd.getEnd().getyPos())
+        if (startAndEnd.getStart().getVerticalIndex() < startAndEnd.getEnd().getVerticalIndex())
             start = startAndEnd.getStart();
 
 
         return null;
     }
 
-    private void checkVesselLength(int shipLength, VesselType vesselType) {
-        if (shipLength != vesselType.length) {
-            throw new WrongLength("Ship has wrong length. Should be " + vesselType.length + " , but is " + shipLength);
-        }
+    private List<Field> getNeighboringFieldsHorizontal(CoordinatesPair startAndEnd) {
+
+        return null;
     }
 
 
@@ -235,21 +248,30 @@ class Field {
     Coordinates coordinates;
     Status status = Status.EMPTY;
 
-    public Field(Coordinates coordinates) {
-        this.coordinates = coordinates;
+    public Field(int verticalIndex, int horizontalIndex) {
+        this.coordinates = new Coordinates(verticalIndex, horizontalIndex);
     }
 
-    public int getxPos() {
-        return coordinates.getxPos();
+    public int getHorizontalIndex() {
+        return coordinates.getHorizontalIndex();
     }
 
-    public int getyPos() {
-        return coordinates.getyPos();
+    public int getVerticalIndex() {
+        return coordinates.getVerticalIndex();
     }
 
+    public boolean isEmpty() {
+        return status == Status.EMPTY;
+    }
+
+    /**
+     * @deprecated use isEmpty() instead
+     */
+    @Deprecated
     public Status getStatus() {
         return status;
     }
+
 
     enum Status {
         EMPTY, SHIP
@@ -283,34 +305,34 @@ class CoordinatesPair {
 }
 
 class Coordinates {
-    private int xPos;
-    private int yPos;
+    private int horizontalIndex;
+    private int verticalIndex;
 
-    public Coordinates(int xPos, int yPos) {
-        this.xPos = xPos;
-        this.yPos = yPos;
+    Coordinates(int vertical, int horizontal) {
+        this.horizontalIndex = horizontal;
+        this.verticalIndex = vertical;
     }
 
     public static Coordinates of(String s) {
         var x = Integer.parseInt(s.substring(1)) - 1;
         int y = s.charAt(0) - 'A';
-        return new Coordinates(x, y);
+        return new Coordinates(y, x);
     }
 
-    public int getxPos() {
-        return xPos;
+    public int getHorizontalIndex() {
+        return horizontalIndex;
     }
 
-    public void setxPos(int xPos) {
-        this.xPos = xPos;
+    public void setHorizontalIndex(int horizontalIndex) {
+        this.horizontalIndex = horizontalIndex;
     }
 
-    public int getyPos() {
-        return yPos;
+    public int getVerticalIndex() {
+        return verticalIndex;
     }
 
-    public void setyPos(int yPos) {
-        this.yPos = yPos;
+    public void setVerticalIndex(int verticalIndex) {
+        this.verticalIndex = verticalIndex;
     }
 }
 

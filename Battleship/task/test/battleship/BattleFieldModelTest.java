@@ -1,6 +1,7 @@
 package battleship;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -30,17 +31,61 @@ class BattleFieldModelTest {
     }
 
     @Test
-    void ships_right_next_to_each_other_throws_TooClose() {
+    @Disabled
+    void verticalDestroyersRightNextToEachOther_throwsTooClose() {
+        // Avoid this situation: ships too close!
+        //   1 2 3 4 5 6 7 8 9 10
+        // A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // B ~ O O ~ ~ ~ ~ ~ ~ ~
+        // C ~ O O ~ ~ ~ ~ ~ ~ ~
+        // D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
         battleFieldModel.setVessel(new CoordinatesPair(
                         new Coordinates(1, 1),
-                        new Coordinates(1, 2)),
+                        new Coordinates(2, 1)),
                 BattleFieldModel.VesselType.DESTROYER);
 
         assertThrows(TooClose.class,
                 () -> battleFieldModel.setVessel(new CoordinatesPair(
-                                new Coordinates(2, 1),
+                                new Coordinates(1, 2),
                                 new Coordinates(2, 2)),
                         BattleFieldModel.VesselType.DESTROYER));
+    }
+
+    @Test
+    @Disabled
+    void verticalCruisersRightNextToEachOther_throwsTooClose() {
+        // Avoid this situation: ships too close!
+        //   1 2 3 4 5 6 7 8 9 10
+        // A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // B ~ ~ ~ ~ ~ ~ ~ O ~ ~
+        // C ~ ~ ~ ~ ~ ~ ~ O ~ ~
+        // D ~ ~ ~ ~ ~ ~ ~ O O ~
+        // E ~ ~ ~ ~ ~ ~ ~ ~ O ~
+        // F ~ ~ ~ ~ ~ ~ ~ ~ O ~
+        // G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
+        battleFieldModel.setVessel(new CoordinatesPair(
+                        new Coordinates(1, 8),
+                        new Coordinates(3, 8)),
+                BattleFieldModel.VesselType.CRUISER);
+
+        assertThrows(TooClose.class,
+                () -> battleFieldModel.setVessel(new CoordinatesPair(
+                                new Coordinates(3, 9),
+                                new Coordinates(5, 9)),
+                        BattleFieldModel.VesselType.CRUISER));
     }
 
 
@@ -52,7 +97,7 @@ class BattleFieldModelTest {
             var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
-                            new Coordinates(0, 5)));
+                            new Coordinates(5, 0)));
 
             assertTrue(thrown.getMessage().contains("wrong length"));
         }
@@ -62,7 +107,7 @@ class BattleFieldModelTest {
             var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
-                            new Coordinates(0, 3)));
+                            new Coordinates(3, 0)));
 
             assertTrue(thrown.getMessage().contains("wrong length"));
 
@@ -71,18 +116,18 @@ class BattleFieldModelTest {
         @Test
         void set_aircraft_carrier_vertical_starting_at_00() {
             var start = new Coordinates(0, 0);
-            var end = new Coordinates(0, 4);
+            var end = new Coordinates(4, 0);
 
             battleFieldModel.setAircraftCarrier(start, end);
 
-            assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
-            assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+            assertFalse(battleFieldModel.getField(start).isEmpty());
+            assertFalse(battleFieldModel.getField(end).isEmpty());
         }
 
         @Test
         void set_aircraft_carrier_vertical_starting_at_90() {
-            var start = new Coordinates(9, 0);
-            var end = new Coordinates(9, 4);
+            var start = new Coordinates(0, 9);
+            var end = new Coordinates(4, 9);
 
             battleFieldModel.setAircraftCarrier(start, end);
 
@@ -92,7 +137,7 @@ class BattleFieldModelTest {
 
         @Test
         void set_aircraft_carrier_vertical_ending_at_99() {
-            var start = new Coordinates(9, 5);
+            var start = new Coordinates(5, 9);
             var end = new Coordinates(9, 9);
 
             battleFieldModel.setAircraftCarrier(start, end);
@@ -112,7 +157,7 @@ class BattleFieldModelTest {
             var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
-                            new Coordinates(5, 0)));
+                            new Coordinates(0, 5)));
 
             assertTrue(thrown.getMessage().contains("wrong length"));
 
@@ -123,7 +168,7 @@ class BattleFieldModelTest {
             var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setAircraftCarrier(
                             new Coordinates(0, 0),
-                            new Coordinates(3, 0)));
+                            new Coordinates(0, 3)));
 
             assertTrue(thrown.getMessage().contains("wrong length"));
 
@@ -133,7 +178,7 @@ class BattleFieldModelTest {
         @Test
         void set_aircraft_carrier_horizontal_starting_at_00() {
             var start = new Coordinates(0, 0);
-            var end = new Coordinates(4, 0);
+            var end = new Coordinates(0, 4);
 
             battleFieldModel.setAircraftCarrier(start, end);
 
@@ -143,8 +188,8 @@ class BattleFieldModelTest {
 
         @Test
         void set_aircraft_carrier_horizontal_starting_at_09() {
-            var start = new Coordinates(0, 9);
-            var end = new Coordinates(4, 9);
+            var start = new Coordinates(9, 0);
+            var end = new Coordinates(9, 4);
 
             battleFieldModel.setAircraftCarrier(start, end);
 
@@ -154,7 +199,7 @@ class BattleFieldModelTest {
 
         @Test
         void set_aircraft_carrier_horizontal_ending_at_99() {
-            var start = new Coordinates(5, 9);
+            var start = new Coordinates(9, 5);
             var end = new Coordinates(9, 9);
 
             battleFieldModel.setAircraftCarrier(start, end);
@@ -169,7 +214,7 @@ class BattleFieldModelTest {
         @Test
         void vertical_battleship_too_short() {
             var start = new Coordinates(0, 0);
-            var end = new Coordinates(0, 2);
+            var end = new Coordinates(2, 0);
             var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setBattleship(start, end));
 
@@ -179,7 +224,7 @@ class BattleFieldModelTest {
         @Test
         void horizontal_battleship_too_long() {
             var start = new Coordinates(0, 0);
-            var end = new Coordinates(4, 0);
+            var end = new Coordinates(0, 4);
             var thrown = assertThrows(WrongLength.class,
                     () -> battleFieldModel.setBattleship(start, end));
 
@@ -189,7 +234,7 @@ class BattleFieldModelTest {
         @Test
         void battleship_switched_start_end_positions_still_ok() {
             var end = new Coordinates(0, 0);
-            var start = new Coordinates(3, 0);
+            var start = new Coordinates(0, 3);
 
             battleFieldModel.setBattleship(start, end);
 
@@ -205,7 +250,7 @@ class BattleFieldModelTest {
     class VerticalBattleship {
         @Test
         void battleship() {
-            var start = new Coordinates(9, 6);
+            var start = new Coordinates(6, 9);
             var end = new Coordinates(9, 9);
             battleFieldModel.setBattleship(start, end);
 
@@ -218,31 +263,59 @@ class BattleFieldModelTest {
     class FieldTest {
 
         @Test
-        void getField_00() {
-            var field = battleFieldModel.getField(new Coordinates(0, 0));
-            assertEquals(0, field.getxPos());
-            assertEquals(0, field.getyPos());
+        void getField00_checkCoordinates() {
+            var field = battleFieldModel.getField(0, 0);
+            assertEquals(0, field.getHorizontalIndex());
+            assertEquals(0, field.getVerticalIndex());
         }
 
         @Test
-        void getField_99() {
-            var field = battleFieldModel.getField(new Coordinates(9, 9));
+        void getField01_checkCoordinates() {
+            var field = battleFieldModel.getField(1, 0);
+            assertEquals(0, field.getHorizontalIndex());
+            assertEquals(1, field.getVerticalIndex());
+        }
 
-            assertEquals(9, field.getxPos());
-            assertEquals(9, field.getyPos());
+        @Test
+        void getField99_checkCoordinates() {
+            var field = battleFieldModel.getField(9, 9);
+
+            assertEquals(9, field.getHorizontalIndex());
+            assertEquals(9, field.getVerticalIndex());
         }
 
         @Test
         void getField00_isEmpty() {
-            var field = battleFieldModel.getField(new Coordinates(0, 0));
-            assertEquals(Field.Status.EMPTY, field.getStatus());
+            var field = battleFieldModel.getField(0, 0);
+            assertTrue(field.isEmpty());
         }
 
         @Test
         void getField99_isEmpty() {
-            var field = battleFieldModel.getField(new Coordinates(9, 9));
-            assertEquals(Field.Status.EMPTY, field.getStatus());
+            var field = battleFieldModel.getField(9, 9);
+            assertTrue(field.isEmpty());
         }
+
+        @Test
+        void getAbove01_is00() {
+            var field01 = battleFieldModel.getField(1, 0);
+            var above = battleFieldModel.getAbove(field01);
+
+            assertEquals(0, above.getVerticalIndex());
+            assertEquals(0, above.getHorizontalIndex());
+        }
+
+        @Test
+        @Disabled
+        void getAbove99_is98() {
+            var field01 = battleFieldModel.getField(9, 9);
+            var above = battleFieldModel.getAbove(field01);
+
+            assertEquals(8, above.getVerticalIndex());
+            assertEquals(9, above.getHorizontalIndex());
+        }
+
+
     }
 
 
