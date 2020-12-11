@@ -125,7 +125,7 @@ class BattleFieldModelTest {
         }
 
         @Test
-        void set_aircraft_carrier_vertical_starting_at_90() {
+        void set_aircraft_carrier_vertical_starting_at_09() {
             var start = new Coordinates(0, 9);
             var end = new Coordinates(4, 9);
 
@@ -187,7 +187,7 @@ class BattleFieldModelTest {
         }
 
         @Test
-        void set_aircraft_carrier_horizontal_starting_at_09() {
+        void set_aircraft_carrier_horizontal_starting_at_90() {
             var start = new Coordinates(9, 0);
             var end = new Coordinates(9, 4);
 
@@ -262,57 +262,144 @@ class BattleFieldModelTest {
     @Nested
     class FieldTest {
 
-        @Test
-        void getField00_checkCoordinates() {
-            var field = battleFieldModel.getField(0, 0);
-            assertEquals(0, field.getHorizontalIndex());
-            assertEquals(0, field.getVerticalIndex());
+        @Nested
+        class Get {
+
+            @Test
+            void getField00_checkCoordinates() {
+                var field = battleFieldModel.getField(0, 0);
+                assertEquals(0, field.getHorizontalIndex());
+                assertEquals(0, field.getVerticalIndex());
+            }
+
+            @Test
+            void getField01_checkCoordinates() {
+                var field = battleFieldModel.getField(1, 0);
+                assertEquals(0, field.getHorizontalIndex());
+                assertEquals(1, field.getVerticalIndex());
+            }
+
+            @Test
+            void getField99_checkCoordinates() {
+                var field = battleFieldModel.getField(9, 9);
+
+                assertEquals(9, field.getHorizontalIndex());
+                assertEquals(9, field.getVerticalIndex());
+            }
+
+            @Test
+            void getField00_isEmpty() {
+                var field = battleFieldModel.getField(0, 0);
+                assertTrue(field.isEmpty());
+            }
+
+            @Test
+            void getField99_isEmpty() {
+                var field = battleFieldModel.getField(9, 9);
+                assertTrue(field.isEmpty());
+            }
         }
 
-        @Test
-        void getField01_checkCoordinates() {
-            var field = battleFieldModel.getField(1, 0);
-            assertEquals(0, field.getHorizontalIndex());
-            assertEquals(1, field.getVerticalIndex());
+        @Nested
+        class Left {
+            @Test
+            void leftOf00_isNull() {
+                var current = battleFieldModel.getField(0, 0);
+                var left = battleFieldModel.leftOf(current);
+
+                assertNull(left);
+            }
+
+            @Test
+            void leftOf09_is08() {
+                var current = battleFieldModel.getField(0, 9);
+                var left = battleFieldModel.leftOf(current);
+
+                assertEquals(8, left.getHorizontalIndex());
+                assertEquals(0, left.getVerticalIndex());
+            }
         }
 
-        @Test
-        void getField99_checkCoordinates() {
-            var field = battleFieldModel.getField(9, 9);
+        @Nested
+        class Above {
 
-            assertEquals(9, field.getHorizontalIndex());
-            assertEquals(9, field.getVerticalIndex());
+            @Test
+            void of10_is00() {
+                var current = battleFieldModel.getField(1, 0);
+                var above = battleFieldModel.aboveOf(current);
+
+                assertEquals(0, above.getVerticalIndex());
+                assertEquals(0, above.getHorizontalIndex());
+            }
+
+            @Test
+            void of00_isNull() {
+                var current = battleFieldModel.getField(0, 0);
+                var above = battleFieldModel.aboveOf(current);
+
+                assertNull(above);
+            }
+
+            @Test
+            void of09_isNull() {
+                var current = battleFieldModel.getField(0, 9);
+                var above = battleFieldModel.aboveOf(current);
+
+                assertNull(above);
+            }
+
+            @Test
+            void of99_is89() {
+                var field01 = battleFieldModel.getField(9, 9);
+                var above = battleFieldModel.aboveOf(field01);
+
+                assertEquals(8, above.getVerticalIndex());
+                assertEquals(9, above.getHorizontalIndex());
+            }
         }
 
-        @Test
-        void getField00_isEmpty() {
-            var field = battleFieldModel.getField(0, 0);
-            assertTrue(field.isEmpty());
+        @Nested
+        class Below {
+
+            @Test
+            void of99_isNull() {
+                var current = battleFieldModel.getField(9, 9);
+                Field below = battleFieldModel.belowOf(current);
+
+                assertNull(below);
+            }
+
+            @Test
+            void of00_is10() {
+                var current = battleFieldModel.getField(0, 0);
+
+                var below = battleFieldModel.belowOf(current);
+
+                assertEquals(1, below.getVerticalIndex());
+                assertEquals(0, below.getHorizontalIndex());
+            }
         }
 
-        @Test
-        void getField99_isEmpty() {
-            var field = battleFieldModel.getField(9, 9);
-            assertTrue(field.isEmpty());
-        }
+        @Nested
+        class Right {
+            @Test
+            void of99_isNull() {
+                var current = battleFieldModel.getField(9, 9);
 
-        @Test
-        void getAbove01_is00() {
-            var field01 = battleFieldModel.getField(1, 0);
-            var above = battleFieldModel.getAbove(field01);
+                Field right = battleFieldModel.rightOf(current);
 
-            assertEquals(0, above.getVerticalIndex());
-            assertEquals(0, above.getHorizontalIndex());
-        }
+                assertNull(right);
+            }
 
-        @Test
-        @Disabled
-        void getAbove99_is98() {
-            var field01 = battleFieldModel.getField(9, 9);
-            var above = battleFieldModel.getAbove(field01);
+            @Test
+            void of00_is01() {
+                var current = battleFieldModel.getField(0, 0);
 
-            assertEquals(8, above.getVerticalIndex());
-            assertEquals(9, above.getHorizontalIndex());
+                var right = battleFieldModel.rightOf(current);
+
+                assertEquals(1, right.getHorizontalIndex());
+                assertEquals(0, right.getVerticalIndex());
+            }
         }
 
 

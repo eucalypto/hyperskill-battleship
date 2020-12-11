@@ -125,10 +125,6 @@ class BattleFieldModel {
         return fields[vertical][horizontal];
     }
 
-    public Field getAbove(Field current) {
-        return getField(0, 0);
-    }
-
     public void setVessel(CoordinatesPair startAndEnd, VesselType vesselType) {
 
         var startCoordinates = startAndEnd.getStart();
@@ -166,7 +162,45 @@ class BattleFieldModel {
 
     }
 
-    @Deprecated
+    public Field aboveOf(Field current) {
+        if (current.getVerticalIndex() == 0)
+            return null;
+
+        var vertical = current.getVerticalIndex() - 1;
+        var horizontal = current.getHorizontalIndex();
+
+        return getField(vertical, horizontal);
+    }
+
+    public Field belowOf(Field current) {
+        if (current.getVerticalIndex() == FIELD_SIZE - 1)
+            return null;
+
+        var vertical = current.getVerticalIndex() + 1;
+        var horizontal = current.getHorizontalIndex();
+
+        return getField(vertical, horizontal);
+    }
+
+    public Field leftOf(Field current) {
+        if (current.getHorizontalIndex() == 0)
+            return null;
+
+        var horizontal = current.getHorizontalIndex() - 1;
+        var vertical = current.getVerticalIndex();
+        return getField(vertical, horizontal);
+    }
+
+    public Field rightOf(Field current) {
+        if (current.getHorizontalIndex() == FIELD_SIZE - 1)
+            return null;
+
+        var horizontal = current.getHorizontalIndex() + 1;
+        var vertical = current.getVerticalIndex();
+
+        return getField(vertical, horizontal);
+    }
+
     Field getField(Coordinates coordinates) {
         return fields[coordinates.getVerticalIndex()][coordinates.getHorizontalIndex()];
     }
