@@ -451,6 +451,18 @@ files:
         }
     }
   learner_created: false
+- name: test/battleship/BattleFieldModelTest.java
+  visible: true
+  learner_created: true
+- name: test/battleship/BattleFieldTest.java
+  visible: true
+  learner_created: true
+- name: test/battleship/FieldTest.java
+  visible: true
+  learner_created: true
+- name: test/battleship/CoordinatesTest.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/125/stages/664/implement#comment
 status: Unchecked
 record: -1
