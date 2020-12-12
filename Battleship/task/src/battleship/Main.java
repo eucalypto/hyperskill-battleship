@@ -1,6 +1,6 @@
 package battleship;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -83,15 +83,18 @@ class BattleField {
             System.out.printf("Enter the coordinates of the %s (%d cells):\n",
                     vesselType.getName(), vesselType.getLength());
             var rawInput = scanner.nextLine();
-            CoordinatesPair coordinatesPair = getPositionPairFromRawInput(rawInput);
             try {
+                CoordinatesPair coordinatesPair = getPositionPairFromRawInput(rawInput);
                 battleFieldModel.setVessel(coordinatesPair, vesselType);
                 notSet = false;
             } catch (WrongLength wrongLength) {
                 System.out.printf("Error! Wrong length of the %s! Try again:\n", vesselType.getName());
             } catch (WrongLocation wrongLocation) {
                 System.out.println("Error! Wrong ship location! Try again:");
+            } catch (TooClose tooClose) {
+                System.out.println("Error! You placed it too close to another one. Try again:\n");
             }
+
         }
     }
 
@@ -99,6 +102,7 @@ class BattleField {
         var input = rawInput.strip().split(" ");
         Coordinates start = Coordinates.of(input[0]);
         var end = Coordinates.of(input[1]);
+
         return new CoordinatesPair(start, end);
     }
 }
@@ -231,24 +235,67 @@ class BattleFieldModel {
 
     private void checkVesselVicinityVertical(CoordinatesPair startAndEnd) {
         Set<Field> vicinity = getNeighboringFieldsVertical(startAndEnd);
+
+        checkFreeVicinity(vicinity);
+    }
+
+    private void checkFreeVicinity(Set<Field> vicinity) {
+        var anyNotFree = vicinity.stream().anyMatch(field -> !field.isEmpty());
+
+        if (anyNotFree)
+            throw new TooClose();
     }
 
     private void checkVesselVicinityHorizontal(CoordinatesPair startAndEnd) {
-        List<Field> vicinity = getNeighboringFieldsHorizontal(startAndEnd);
+        Set<Field> vicinity = getNeighboringFieldsHorizontal(startAndEnd);
+
+        checkFreeVicinity(vicinity);
     }
 
     private Set<Field> getNeighboringFieldsVertical(CoordinatesPair startAndEnd) {
-        Coordinates start;
-        if (startAndEnd.getStart().getVerticalIndex() < startAndEnd.getEnd().getVerticalIndex())
-            start = startAndEnd.getStart();
+        var neighbors = new HashSet<Field>();
 
+        CoordinatesPair ordered = startAndEnd.orderVertical();
 
-        return null;
+        var current = getField(ordered.getStart());
+        var end = getField(ordered.getEnd());
+
+        while (current != null && current.getVerticalIndex() <= end.getVerticalIndex()) {
+            neighbors.add(current);
+            neighbors.add(aboveOf(current));
+            neighbors.add(belowOf(current));
+            neighbors.add(leftOf(current));
+            neighbors.add(rightOf(current));
+
+            current = belowOf(current);
+        }
+
+        neighbors.remove(null);
+
+        return neighbors;
     }
 
-    private List<Field> getNeighboringFieldsHorizontal(CoordinatesPair startAndEnd) {
+    private Set<Field> getNeighboringFieldsHorizontal(CoordinatesPair startAndEnd) {
+        var neighbors = new HashSet<Field>();
 
-        return null;
+        CoordinatesPair ordered = startAndEnd.orderHorizontal();
+
+        var current = getField(ordered.getStart());
+        var end = getField(ordered.getEnd());
+
+        while (current != null && current.getHorizontalIndex() <= end.getHorizontalIndex()) {
+            neighbors.add(current);
+            neighbors.add(aboveOf(current));
+            neighbors.add(belowOf(current));
+            neighbors.add(leftOf(current));
+            neighbors.add(rightOf(current));
+
+            current = rightOf(current);
+        }
+
+        neighbors.remove(null);
+
+        return neighbors;
     }
 
 
@@ -336,6 +383,20 @@ class CoordinatesPair {
     public void setEnd(Coordinates end) {
         this.end = end;
     }
+
+    public CoordinatesPair orderVertical() {
+        if (start.getVerticalIndex() > end.getVerticalIndex())
+            return new CoordinatesPair(end, start);
+        else
+            return this;
+    }
+
+    public CoordinatesPair orderHorizontal() {
+        if (start.getHorizontalIndex() > end.getHorizontalIndex())
+            return new CoordinatesPair(end, start);
+        else
+            return this;
+    }
 }
 
 class Coordinates {
@@ -350,8 +411,21 @@ class Coordinates {
     public static Coordinates of(String s) {
         var x = Integer.parseInt(s.substring(1)) - 1;
         int y = s.charAt(0) - 'A';
+
+        if (outsideField(x) || outsideField(y))
+            throw new WrongLocation();
+
         return new Coordinates(y, x);
     }
+
+    private static boolean outsideField(int coordinate) {
+        if (coordinate < 0)
+            return true;
+        if (coordinate >= Constants.FIELD_SIZE)
+            return true;
+        return false;
+    }
+
 
     public int getHorizontalIndex() {
         return horizontalIndex;

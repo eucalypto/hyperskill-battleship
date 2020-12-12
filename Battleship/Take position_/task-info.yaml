@@ -289,9 +289,6 @@ files:
 - name: test/battleship/BattleFieldModelTest.java
   visible: true
   learner_created: true
-- name: test/battleship/PositionTest.java
-  visible: true
-  learner_created: true
 - name: test/battleship/CoordinatesTest.java
   visible: true
   learner_created: true
@@ -299,5 +296,8 @@ files:
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/125/stages/663/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Sat, 12 Dec 2020 16:35:44 UTC
 record: -1

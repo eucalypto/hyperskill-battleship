@@ -1,7 +1,6 @@
 package battleship;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,6 @@ class BattleFieldModelTest {
     }
 
     @Test
-    @Disabled
     void verticalDestroyersRightNextToEachOther_throwsTooClose() {
         // Avoid this situation: ships too close!
         //   1 2 3 4 5 6 7 8 9 10
@@ -60,7 +58,34 @@ class BattleFieldModelTest {
     }
 
     @Test
-    @Disabled
+    void verticalDestroyersRightAfterEachOther_throwsTooClose() {
+        // Avoid this situation: ships too close!
+        //   1 2 3 4 5 6 7 8 9 10
+        // A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // B ~ O ~ ~ ~ ~ ~ ~ ~ ~
+        // C ~ O ~ ~ ~ ~ ~ ~ ~ ~
+        // D ~ O O ~ ~ ~ ~ ~ ~ ~
+        // E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
+        battleFieldModel.setVessel(new CoordinatesPair(
+                        new Coordinates(3, 1),
+                        new Coordinates(3, 2)),
+                BattleFieldModel.VesselType.DESTROYER);
+
+        assertThrows(TooClose.class,
+                () -> battleFieldModel.setVessel(new CoordinatesPair(
+                                new Coordinates(1, 1),
+                                new Coordinates(2, 1)),
+                        BattleFieldModel.VesselType.DESTROYER));
+    }
+
+    @Test
     void verticalCruisersRightNextToEachOther_throwsTooClose() {
         // Avoid this situation: ships too close!
         //   1 2 3 4 5 6 7 8 9 10
@@ -85,6 +110,34 @@ class BattleFieldModelTest {
                 () -> battleFieldModel.setVessel(new CoordinatesPair(
                                 new Coordinates(3, 9),
                                 new Coordinates(5, 9)),
+                        BattleFieldModel.VesselType.CRUISER));
+    }
+
+    @Test
+    void horizontalCruisersRightOfOtherCruiser_throwsTooClose() {
+        // Avoid this situation: ships too close!
+        //   1 2 3 4 5 6 7 8 9 10
+        // A ~ ~ ~ ~ ~ ~ O O O O
+        // B ~ ~ ~ ~ ~ ~ O ~ ~ ~
+        // C ~ ~ ~ ~ ~ ~ O ~ ~ ~
+        // D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
+        battleFieldModel.setVessel(new CoordinatesPair(
+                        new Coordinates(0, 6),
+                        new Coordinates(2, 6)),
+                BattleFieldModel.VesselType.CRUISER);
+
+        assertThrows(TooClose.class,
+                () -> battleFieldModel.setVessel(new CoordinatesPair(
+                                new Coordinates(0, 7),
+                                new Coordinates(0, 9)),
                         BattleFieldModel.VesselType.CRUISER));
     }
 
@@ -119,6 +172,17 @@ class BattleFieldModelTest {
             var end = new Coordinates(4, 0);
 
             battleFieldModel.setAircraftCarrier(start, end);
+
+            assertFalse(battleFieldModel.getField(start).isEmpty());
+            assertFalse(battleFieldModel.getField(end).isEmpty());
+        }
+
+        @Test
+        void set_aircraft_carrier_vertical_starting_at_00_inverted_input() {
+            var start = new Coordinates(0, 0);
+            var end = new Coordinates(4, 0);
+
+            battleFieldModel.setAircraftCarrier(end, start);
 
             assertFalse(battleFieldModel.getField(start).isEmpty());
             assertFalse(battleFieldModel.getField(end).isEmpty());
@@ -181,6 +245,17 @@ class BattleFieldModelTest {
             var end = new Coordinates(0, 4);
 
             battleFieldModel.setAircraftCarrier(start, end);
+
+            assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
+            assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
+        }
+
+        @Test
+        void set_aircraft_carrier_horizontal_starting_at_00_inverted_input() {
+            var start = new Coordinates(0, 0);
+            var end = new Coordinates(0, 4);
+
+            battleFieldModel.setAircraftCarrier(end, start);
 
             assertEquals(Field.Status.SHIP, battleFieldModel.getField(start).getStatus());
             assertEquals(Field.Status.SHIP, battleFieldModel.getField(end).getStatus());
