@@ -143,5 +143,53 @@ class BattleFieldTest {
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
+    @Test
+    void missedShot_markedWithM() {
+        var shot = new Coordinates(0, 0);
+
+        battleField.battleFieldModel.takeShot(shot);
+
+        var fieldRepresentation = battleField.getRepresentationString();
+
+        var emptyFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A M ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+        assertEquals(emptyFieldRepresentation, fieldRepresentation);
+    }
+
+    @Test
+    void hitShot_markedWithX() {
+
+        battleField.battleFieldModel.setSubmarine(
+                new Coordinates(0, 0),
+                new Coordinates(2, 0));
+
+        var shot = new Coordinates(0, 0);
+        battleField.battleFieldModel.takeShot(shot);
+
+        var fieldRepresentation = battleField.getRepresentationString();
+
+        var emptyFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A X ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+        assertEquals(emptyFieldRepresentation, fieldRepresentation);
+    }
+
 
 }

@@ -480,5 +480,41 @@ class BattleFieldModelTest {
 
     }
 
+    @Nested
+    class Hit {
+
+        @Test
+        void hitWater_isMiss() {
+            assertFalse(battleFieldModel.takeShot(0, 0));
+        }
+
+        @Test
+        void hitWater_isMarkedMiss() {
+            var shot = new Coordinates(1, 1);
+            battleFieldModel.takeShot(shot);
+
+            var target = battleFieldModel.getField(shot);
+
+            assertEquals(Field.Status.MISS, target.getStatus());
+        }
+
+        @Test
+        void hitShip_isMarkedHit() {
+            battleFieldModel.setVessel(
+                    new CoordinatesPair(
+                            new Coordinates(0, 0),
+                            new Coordinates(0, 1)),
+                    BattleFieldModel.VesselType.DESTROYER);
+
+            var shot = new Coordinates(0, 0);
+
+            battleFieldModel.takeShot(shot);
+
+            var target = battleFieldModel.getField(shot);
+
+            assertEquals(Field.Status.HIT, target.getStatus());
+        }
+    }
+
 
 }

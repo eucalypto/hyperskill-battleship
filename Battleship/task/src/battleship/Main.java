@@ -25,6 +25,11 @@ public class Main {
 
         battleFiled.setDestroyer();
         System.out.println(battleFiled.getRepresentationString() + "\n");
+
+        battleFiled.startGame();
+
+        battleFiled.takeShot();
+        System.out.println(battleFiled.getRepresentationString() + "\n");
     }
 }
 
@@ -42,12 +47,18 @@ class BattleField {
             rowLetter++;
             for (var field : row) {
                 ret.append(" ");
-                switch (field.status) {
+                switch (field.getStatus()) {
                     case EMPTY:
                         ret.append("~");
                         break;
                     case SHIP:
                         ret.append("O");
+                        break;
+                    case MISS:
+                        ret.append("M");
+                        break;
+                    case HIT:
+                        ret.append("X");
                         break;
                 }
             }
@@ -74,6 +85,36 @@ class BattleField {
 
     public void setDestroyer() {
         setVessel(BattleFieldModel.VesselType.DESTROYER);
+    }
+
+    public void takeShot() {
+        var notFinished = true;
+
+        while (notFinished) {
+            System.out.println("Take a shot!");
+
+            Coordinates shot;
+            try {
+                var rawInput = scanner.next();
+                shot = Coordinates.of(rawInput);
+            } catch (WrongLocation wrongLocation) {
+                System.out.println("Error! You entered the wrong coordinates! Try again:");
+                continue;
+            }
+
+            var success = battleFieldModel.takeShot(shot);
+
+            if (success)
+                System.out.println("You hit a ship!");
+            else
+                System.out.println("You missed!");
+
+            notFinished = false;
+        }
+    }
+
+    public void startGame() {
+        System.out.println("The game starts!");
     }
 
     void setVessel(BattleFieldModel.VesselType vesselType) {
@@ -146,7 +187,7 @@ class BattleFieldModel {
 
             var xPos = startCoordinates.getHorizontalIndex();
             for (int yPos = start; yPos <= end; yPos++) {
-                fields[yPos][xPos].status = Field.Status.SHIP;
+                fields[yPos][xPos].setStatus(Field.Status.SHIP);
             }
         } else if (isHorizontal) {
             var start = Math.min(startCoordinates.getHorizontalIndex(), endCoordinates.getHorizontalIndex());
@@ -158,7 +199,7 @@ class BattleFieldModel {
 
             var row = startCoordinates.getVerticalIndex();
             for (int x = start; x <= end; x++) {
-                fields[row][x].status = Field.Status.SHIP;
+                fields[row][x].setStatus(Field.Status.SHIP);
             }
         } else {
             throw new WrongLocation("Vessel must be either horizontal or vertical!");
@@ -203,6 +244,25 @@ class BattleFieldModel {
         var vertical = current.getVerticalIndex();
 
         return getField(vertical, horizontal);
+    }
+
+    public boolean takeShot(int vertical, int horizontal) {
+        var field = getField(vertical, horizontal);
+
+        if (field.getStatus() == Field.Status.SHIP) {
+            field.setStatus(Field.Status.HIT);
+            return true;
+        }
+
+        if (field.isEmpty()) {
+            field.setStatus(Field.Status.MISS);
+        }
+
+        return false;
+    }
+
+    public boolean takeShot(Coordinates shot) {
+        return takeShot(shot.getVerticalIndex(), shot.getHorizontalIndex());
     }
 
     Field getField(Coordinates coordinates) {
@@ -326,8 +386,8 @@ class BattleFieldModel {
 }
 
 class Field {
-    Coordinates coordinates;
-    Status status = Status.EMPTY;
+    private final Coordinates coordinates;
+    private Status status = Status.EMPTY;
 
     public Field(int verticalIndex, int horizontalIndex) {
         this.coordinates = new Coordinates(verticalIndex, horizontalIndex);
@@ -345,17 +405,16 @@ class Field {
         return status == Status.EMPTY;
     }
 
-    /**
-     * @deprecated use isEmpty() instead
-     */
-    @Deprecated
     public Status getStatus() {
         return status;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     enum Status {
-        EMPTY, SHIP
+        EMPTY, SHIP, MISS, HIT
     }
 }
 
