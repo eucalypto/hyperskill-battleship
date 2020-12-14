@@ -127,16 +127,19 @@ class BattleField {
                 continue;
             }
 
+            var success = battleFieldModel.takeShot(shot);
 
             System.out.println(getRepresentationStringWithFogOfWar());
 
-            var success = battleFieldModel.takeShot(shot);
             switch (success) {
                 case SHIP_HIT:
                     System.out.println("You hit a ship! Try again:");
                     break;
                 case SHIP_SUNK:
                     System.out.println("You sank a ship! Specify a new target:");
+                    break;
+                case LAST_SHIP_SUNK:
+                    System.out.println("You sank the last ship. You won. Congratulations!");
                     break;
                 case MISS:
                     System.out.println("You missed! Try again:");
@@ -153,7 +156,7 @@ class BattleField {
 
         System.out.println(getRepresentationStringWithFogOfWar());
 
-        while (shipsRemain()) {
+        while (battleFieldModel.shipsRemain()) {
             takeShot();
         }
     }
@@ -178,10 +181,6 @@ class BattleField {
             }
 
         }
-    }
-
-    private boolean shipsRemain() {
-        return true;
     }
 
     private CoordinatesPair getPositionPairFromRawInput(String rawInput) {
@@ -310,8 +309,12 @@ class BattleFieldModel {
             updateShips(field);
             var shipsAfterShot = getShipNumber();
 
-            if (shipsBeforeShot != shipsAfterShot)
+            if (shipsBeforeShot != shipsAfterShot) {
+                if (shipsAfterShot == 0)
+                    return ShotResult.LAST_SHIP_SUNK;
+
                 return ShotResult.SHIP_SUNK;
+            }
 
 
             return ShotResult.SHIP_HIT;
@@ -326,6 +329,10 @@ class BattleFieldModel {
 
     public ShotResult takeShot(Coordinates shot) {
         return takeShot(shot.getVerticalIndex(), shot.getHorizontalIndex());
+    }
+
+    public boolean shipsRemain() {
+        return ships.size() > 0;
     }
 
     Field getField(Coordinates coordinates) {
@@ -433,7 +440,7 @@ class BattleFieldModel {
     }
 
     enum ShotResult {
-        SHIP_HIT, SHIP_SUNK, MISS;
+        SHIP_HIT, SHIP_SUNK, LAST_SHIP_SUNK, MISS;
     }
 
 
