@@ -485,7 +485,7 @@ class BattleFieldModelTest {
 
         @Test
         void hitWater_isMiss() {
-            assertFalse(battleFieldModel.takeShot(0, 0));
+            assertEquals(BattleFieldModel.ShotResult.MISS, battleFieldModel.takeShot(0, 0));
         }
 
         @Test

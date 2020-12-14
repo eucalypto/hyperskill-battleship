@@ -28,8 +28,7 @@ public class Main {
 
         battleFiled.startGame();
 
-        battleFiled.takeShot();
-        System.out.println(battleFiled.getRepresentationString() + "\n");
+
     }
 }
 
@@ -130,11 +129,15 @@ class BattleField {
 
             var success = battleFieldModel.takeShot(shot);
 
-            if (success) {
-                System.out.println(getRepresentationStringWithFogOfWar());
-                System.out.println("You hit a ship!");
-            } else {
-                System.out.println("You missed!");
+            switch (success) {
+                case SHIP_HIT:
+                    System.out.println(getRepresentationStringWithFogOfWar());
+                    System.out.println("You hit a ship! Try again:");
+                    break;
+                case MISS:
+                    System.out.println(getRepresentationStringWithFogOfWar());
+                    System.out.println("You missed! Try again:");
+                    break;
             }
 
             notFinished = false;
@@ -146,6 +149,10 @@ class BattleField {
         System.out.println("The game starts!");
 
         System.out.println(getRepresentationStringWithFogOfWar());
+
+        while (shipsRemain()) {
+            takeShot();
+        }
     }
 
     void setVessel(BattleFieldModel.VesselType vesselType) {
@@ -168,6 +175,10 @@ class BattleField {
             }
 
         }
+    }
+
+    private boolean shipsRemain() {
+        return true;
     }
 
     private CoordinatesPair getPositionPairFromRawInput(String rawInput) {
@@ -277,22 +288,22 @@ class BattleFieldModel {
         return getField(vertical, horizontal);
     }
 
-    public boolean takeShot(int vertical, int horizontal) {
+    public ShotResult takeShot(int vertical, int horizontal) {
         var field = getField(vertical, horizontal);
 
         if (field.getStatus() == Field.Status.SHIP) {
             field.setStatus(Field.Status.HIT);
-            return true;
+            return ShotResult.SHIP_HIT;
         }
 
         if (field.isEmpty()) {
             field.setStatus(Field.Status.MISS);
         }
 
-        return false;
+        return ShotResult.MISS;
     }
 
-    public boolean takeShot(Coordinates shot) {
+    public ShotResult takeShot(Coordinates shot) {
         return takeShot(shot.getVerticalIndex(), shot.getHorizontalIndex());
     }
 
@@ -387,6 +398,10 @@ class BattleFieldModel {
         neighbors.remove(null);
 
         return neighbors;
+    }
+
+    enum ShotResult {
+        SHIP_HIT, SHIP_SUNK, MISS;
     }
 
 
