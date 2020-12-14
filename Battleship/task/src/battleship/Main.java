@@ -127,15 +127,18 @@ class BattleField {
                 continue;
             }
 
-            var success = battleFieldModel.takeShot(shot);
 
+            System.out.println(getRepresentationStringWithFogOfWar());
+
+            var success = battleFieldModel.takeShot(shot);
             switch (success) {
                 case SHIP_HIT:
-                    System.out.println(getRepresentationStringWithFogOfWar());
                     System.out.println("You hit a ship! Try again:");
                     break;
+                case SHIP_SUNK:
+                    System.out.println("You sank a ship! Specify a new target:");
+                    break;
                 case MISS:
-                    System.out.println(getRepresentationStringWithFogOfWar());
                     System.out.println("You missed! Try again:");
                     break;
             }
@@ -198,6 +201,7 @@ class BattleFieldModel {
     static final int FIELD_SIZE = Constants.FIELD_SIZE;
 
     Field[][] fields = new Field[FIELD_SIZE][FIELD_SIZE];
+    Set<Set<Field>> ships = new HashSet<>(new HashSet<>());
 
     BattleFieldModel() {
 
@@ -214,6 +218,8 @@ class BattleFieldModel {
 
     public void setVessel(CoordinatesPair startAndEnd, VesselType vesselType) {
 
+        var ship = new HashSet<Field>();
+
         var startCoordinates = startAndEnd.getStart();
         var endCoordinates = startAndEnd.getEnd();
 
@@ -229,7 +235,9 @@ class BattleFieldModel {
 
             var xPos = startCoordinates.getHorizontalIndex();
             for (int yPos = start; yPos <= end; yPos++) {
-                fields[yPos][xPos].setStatus(Field.Status.SHIP);
+                var field = fields[yPos][xPos];
+                field.setStatus(Field.Status.SHIP);
+                ship.add(field);
             }
         } else if (isHorizontal) {
             var start = Math.min(startCoordinates.getHorizontalIndex(), endCoordinates.getHorizontalIndex());
@@ -241,11 +249,16 @@ class BattleFieldModel {
 
             var row = startCoordinates.getVerticalIndex();
             for (int x = start; x <= end; x++) {
-                fields[row][x].setStatus(Field.Status.SHIP);
+                var field = fields[row][x];
+                field.setStatus(Field.Status.SHIP);
+                ship.add(field);
             }
         } else {
             throw new WrongLocation("Vessel must be either horizontal or vertical!");
         }
+
+
+        ships.add(ship);
 
     }
 
@@ -292,7 +305,15 @@ class BattleFieldModel {
         var field = getField(vertical, horizontal);
 
         if (field.getStatus() == Field.Status.SHIP) {
+            var shipsBeforeShot = getShipNumber();
             field.setStatus(Field.Status.HIT);
+            updateShips(field);
+            var shipsAfterShot = getShipNumber();
+
+            if (shipsBeforeShot != shipsAfterShot)
+                return ShotResult.SHIP_SUNK;
+
+
             return ShotResult.SHIP_HIT;
         }
 
@@ -327,6 +348,17 @@ class BattleFieldModel {
     @Deprecated
     void setSubmarine(Coordinates startCoordinates, Coordinates endCoordinates) {
         setVessel(new CoordinatesPair(startCoordinates, endCoordinates), VesselType.SUBMARINE);
+    }
+
+    private void updateShips(Field field) {
+        for (var ship : ships) {
+            ship.removeIf(shipField -> shipField == field);
+        }
+        ships.removeIf(ship -> ship.isEmpty());
+    }
+
+    private int getShipNumber() {
+        return ships.size();
     }
 
     private void checkVesselLength(int shipLength, VesselType vesselType) {

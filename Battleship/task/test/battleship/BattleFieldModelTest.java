@@ -141,6 +141,20 @@ class BattleFieldModelTest {
                         BattleFieldModel.VesselType.CRUISER));
     }
 
+    @Test
+    void allPartsOfShipHit_isSunk() {
+        battleFieldModel.setVessel(
+                new CoordinatesPair(
+                        new Coordinates(0, 0),
+                        new Coordinates(0, 1)),
+                BattleFieldModel.VesselType.DESTROYER);
+
+        var firstHit = battleFieldModel.takeShot(0, 0);
+        assertEquals(BattleFieldModel.ShotResult.SHIP_HIT, firstHit);
+
+        var lastHit = battleFieldModel.takeShot(0, 1);
+        assertEquals(BattleFieldModel.ShotResult.SHIP_SUNK, lastHit);
+    }
 
     @Nested
     class VerticalAircraftCarrier {
@@ -211,7 +225,6 @@ class BattleFieldModelTest {
         }
 
     }
-
 
     @Nested
     class HorizontalAircraftCarrier {
@@ -319,7 +332,6 @@ class BattleFieldModelTest {
 
 
     }
-
 
     @Nested
     class VerticalBattleship {
