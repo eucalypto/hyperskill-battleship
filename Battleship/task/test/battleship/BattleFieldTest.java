@@ -177,7 +177,7 @@ class BattleFieldTest {
 
         var fieldRepresentation = battleField.getRepresentationString();
 
-        var emptyFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
+        var expectedFieldRepresentation = "  1 2 3 4 5 6 7 8 9 10\n" +
                 "A X ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "B O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "C O ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
@@ -188,8 +188,54 @@ class BattleFieldTest {
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
-        assertEquals(emptyFieldRepresentation, fieldRepresentation);
+        assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
+
+    @Test
+    void createShip_hidByFogOfWar() {
+        battleField.battleFieldModel.setSubmarine(
+                new Coordinates(0, 0),
+                new Coordinates(0, 2));
+
+
+        var expected = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+        var actual = battleField.getRepresentationStringWithFogOfWar();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void withFogOfWar_hitShip_isMarkedX() {
+        battleField.battleFieldModel.setSubmarine(
+                new Coordinates(0, 0),
+                new Coordinates(0, 2));
+
+
+        battleField.battleFieldModel.takeShot(0, 0);
+
+        var expected = "  1 2 3 4 5 6 7 8 9 10\n" +
+                "A X ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "B ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "D ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "E ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "F ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+        var actual = battleField.getRepresentationStringWithFogOfWar();
+        assertEquals(expected, actual);
+    }
 
 }

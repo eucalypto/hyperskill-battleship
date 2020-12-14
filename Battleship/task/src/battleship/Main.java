@@ -67,6 +67,32 @@ class BattleField {
         return ret.toString();
     }
 
+    public String getRepresentationStringWithFogOfWar() {
+        var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10\n");
+        var rowLetter = 'A';
+        for (var row : battleFieldModel.fields) {
+            ret.append(rowLetter);
+            rowLetter++;
+            for (var field : row) {
+                ret.append(" ");
+                switch (field.getStatus()) {
+                    case EMPTY:
+                    case SHIP:
+                        ret.append("~");
+                        break;
+                    case MISS:
+                        ret.append("M");
+                        break;
+                    case HIT:
+                        ret.append("X");
+                        break;
+                }
+            }
+            ret.append("\n");
+        }
+        return ret.toString();
+    }
+
     public void setAircraftCarrier() {
         setVessel(BattleFieldModel.VesselType.AIRCRAFT_CARRIER);
     }
@@ -104,17 +130,22 @@ class BattleField {
 
             var success = battleFieldModel.takeShot(shot);
 
-            if (success)
+            if (success) {
+                System.out.println(getRepresentationStringWithFogOfWar());
                 System.out.println("You hit a ship!");
-            else
+            } else {
                 System.out.println("You missed!");
+            }
 
             notFinished = false;
         }
+
     }
 
     public void startGame() {
         System.out.println("The game starts!");
+
+        System.out.println(getRepresentationStringWithFogOfWar());
     }
 
     void setVessel(BattleFieldModel.VesselType vesselType) {
