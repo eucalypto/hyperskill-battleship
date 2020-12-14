@@ -7,28 +7,68 @@ import java.util.Set;
 public class Main {
 
     public static void main(String[] args) {
-        var battleFiled = new BattleField();
 
-        System.out.println(battleFiled.getRepresentationString() + "\n");
-
-        battleFiled.setAircraftCarrier();
-        System.out.println(battleFiled.getRepresentationString() + "\n");
-
-        battleFiled.setBattleship();
-        System.out.println(battleFiled.getRepresentationString() + "\n");
-
-        battleFiled.setSubmarine();
-        System.out.println(battleFiled.getRepresentationString() + "\n");
-
-        battleFiled.setCruiser();
-        System.out.println(battleFiled.getRepresentationString() + "\n");
-
-        battleFiled.setDestroyer();
-        System.out.println(battleFiled.getRepresentationString() + "\n");
-
-        battleFiled.startGame();
+        var game = new Game();
+        game.start();
+    }
+}
 
 
+class Game {
+    Scanner scanner = new Scanner(System.in);
+
+    String changePlayer = "Press Enter and pass the move to another player\n";
+    BattleField battleField1 = new BattleField();
+    BattleField battleField2 = new BattleField();
+
+    boolean gameOn = true;
+    boolean firstPlayersTurn = true;
+
+    public void start() {
+        System.out.println("Player 1, place your ships on the game field\n");
+        battleField1.setUpField();
+        System.out.println(changePlayer);
+        scanner.nextLine();
+
+        System.out.println("Player 2, place your ships to the game field\n");
+        battleField2.setUpField();
+        System.out.println(changePlayer);
+        scanner.nextLine();
+
+
+        while (gameOn) {
+            if (firstPlayersTurn) {
+                player1Turn();
+            } else {
+                player2Turn();
+            }
+            System.out.println("Press Enter and pass the move to another player");
+            scanner.nextLine();
+            checkGameStatus();
+        }
+    }
+
+    private void checkGameStatus() {
+        if (battleField1.done() || battleField2.done())
+            gameOn = false;
+    }
+
+    private void player2Turn() {
+        System.out.println(battleField1.getRepresentationStringWithFogOfWar());
+        System.out.println("---------------------");
+        System.out.println(battleField2.getRepresentationString());
+        System.out.println("\nPlayer 2, it's your turn:\n");
+        battleField1.takeShot();
+        firstPlayersTurn = true;
+    }
+
+    private void player1Turn() {
+        System.out.println(battleField2.getRepresentationStringWithFogOfWar());
+        System.out.println("---------------------");
+        System.out.println(battleField1.getRepresentationString());
+        System.out.println("\nPlayer 1, it's your turn:\n");
+        battleField2.takeShot();
+        firstPlayersTurn = false;
     }
 }
 
@@ -39,9 +79,10 @@ class BattleField {
 
     public String getRepresentationString() {
 
-        var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10\n");
+        var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10");
         var rowLetter = 'A';
         for (var row : battleFieldModel.fields) {
+            ret.append("\n");
             ret.append(rowLetter);
             rowLetter++;
             for (var field : row) {
@@ -61,15 +102,15 @@ class BattleField {
                         break;
                 }
             }
-            ret.append("\n");
         }
         return ret.toString();
     }
 
     public String getRepresentationStringWithFogOfWar() {
-        var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10\n");
+        var ret = new StringBuilder().append("  1 2 3 4 5 6 7 8 9 10");
         var rowLetter = 'A';
         for (var row : battleFieldModel.fields) {
+            ret.append("\n");
             ret.append(rowLetter);
             rowLetter++;
             for (var field : row) {
@@ -87,9 +128,27 @@ class BattleField {
                         break;
                 }
             }
-            ret.append("\n");
         }
         return ret.toString();
+    }
+
+    public void setUpField() {
+        System.out.println(getRepresentationString() + "\n");
+
+        setAircraftCarrier();
+        System.out.println(getRepresentationString() + "\n");
+
+        setBattleship();
+        System.out.println(getRepresentationString() + "\n");
+
+        setSubmarine();
+        System.out.println(getRepresentationString() + "\n");
+
+        setCruiser();
+        System.out.println(getRepresentationString() + "\n");
+
+        setDestroyer();
+        System.out.println(getRepresentationString() + "\n");
     }
 
     public void setAircraftCarrier() {
@@ -116,8 +175,6 @@ class BattleField {
         var notFinished = true;
 
         while (notFinished) {
-            System.out.println("Take a shot!");
-
             Coordinates shot;
             try {
                 var rawInput = scanner.next();
@@ -129,20 +186,18 @@ class BattleField {
 
             var success = battleFieldModel.takeShot(shot);
 
-            System.out.println(getRepresentationStringWithFogOfWar());
-
             switch (success) {
                 case SHIP_HIT:
-                    System.out.println("You hit a ship! Try again:");
+                    System.out.println("You hit a ship!");
                     break;
                 case SHIP_SUNK:
-                    System.out.println("You sank a ship! Specify a new target:");
+                    System.out.println("You sank a ship!");
                     break;
                 case LAST_SHIP_SUNK:
                     System.out.println("You sank the last ship. You won. Congratulations!");
                     break;
                 case MISS:
-                    System.out.println("You missed! Try again:");
+                    System.out.println("You missed!");
                     break;
             }
 
@@ -159,6 +214,10 @@ class BattleField {
         while (battleFieldModel.shipsRemain()) {
             takeShot();
         }
+    }
+
+    public boolean done() {
+        return !battleFieldModel.shipsRemain();
     }
 
     void setVessel(BattleFieldModel.VesselType vesselType) {

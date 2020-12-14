@@ -29,7 +29,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
         assertEquals(emptyFieldRepresentation, fieldRepresentation);
     }
 
@@ -50,7 +50,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
@@ -71,7 +71,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ O O O O O\n";
+                "J ~ ~ ~ ~ ~ O O O O O";
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
@@ -92,7 +92,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ O O O O\n";
+                "J ~ ~ ~ ~ ~ ~ O O O O";
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
@@ -113,7 +113,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ O\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ O\n" +
-                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ O\n";
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ O";
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
@@ -139,7 +139,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ O O O O\n";
+                "J ~ ~ ~ ~ ~ ~ O O O O";
         assertEquals(expectedFieldRepresentation, fieldRepresentation);
     }
 
@@ -161,7 +161,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
         assertEquals(emptyFieldRepresentation, fieldRepresentation);
     }
 
@@ -187,7 +187,7 @@ class BattleFieldTest {
                 "G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "H ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
                 "I ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
-                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n";
+                "J ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
         assertEquals(emptyFieldRepresentation, fieldRepresentation);
     }
 
