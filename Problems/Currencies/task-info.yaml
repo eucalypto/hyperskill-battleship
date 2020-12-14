@@ -1,0 +1,12 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: // declare your enum here
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/11519#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Sat, 12 Dec 2020 18:47:04 UTC
+record: -1
